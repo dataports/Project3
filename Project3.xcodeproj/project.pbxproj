@@ -15,6 +15,7 @@
 		6E6912DA20865D1000CCF6B3 /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = 6E6912D820865D1000CCF6B3 /* LaunchScreen.storyboard */; };
 		6E6912E520865D1000CCF6B3 /* Project3Tests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E6912E420865D1000CCF6B3 /* Project3Tests.swift */; };
 		6E6912F020865D1000CCF6B3 /* Project3UITests.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E6912EF20865D1000CCF6B3 /* Project3UITests.swift */; };
+		6E8E17E42087A40600594CC1 /* LatLonTableViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = 6E8E17E32087A40600594CC1 /* LatLonTableViewCell.swift */; };
 /* End PBXBuildFile section */
 
 /* Begin PBXContainerItemProxy section */
@@ -49,6 +50,7 @@
 		6E6912EB20865D1000CCF6B3 /* Project3UITests.xctest */ = {isa = PBXFileReference; explicitFileType = wrapper.cfbundle; includeInIndex = 0; path = Project3UITests.xctest; sourceTree = BUILT_PRODUCTS_DIR; };
 		6E6912EF20865D1000CCF6B3 /* Project3UITests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Project3UITests.swift; sourceTree = "<group>"; };
 		6E6912F120865D1000CCF6B3 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		6E8E17E32087A40600594CC1 /* LatLonTableViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = LatLonTableViewCell.swift; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -101,6 +103,7 @@
 			children = (
 				6E6912CC20865D1000CCF6B3 /* AppDelegate.swift */,
 				6E6912CE20865D1000CCF6B3 /* ViewController.swift */,
+				6E8E17E32087A40600594CC1 /* LatLonTableViewCell.swift */,
 				6E6912D020865D1000CCF6B3 /* Main.storyboard */,
 				6E6912D620865D1000CCF6B3 /* Assets.xcassets */,
 				6E6912D820865D1000CCF6B3 /* LaunchScreen.storyboard */,
@@ -263,6 +266,7 @@
 			buildActionMask = 2147483647;
 			files = (
 				6E6912CF20865D1000CCF6B3 /* ViewController.swift in Sources */,
+				6E8E17E42087A40600594CC1 /* LatLonTableViewCell.swift in Sources */,
 				6E6912D520865D1000CCF6B3 /* Project3.xcdatamodeld in Sources */,
 				6E6912CD20865D1000CCF6B3 /* AppDelegate.swift in Sources */,
 			);

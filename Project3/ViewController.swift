@@ -31,7 +31,7 @@ final class LocationAnnotation: NSObject, MKAnnotation {
 }
 
 
-class ViewController: UIViewController, UITableViewDataSource {
+class ViewController: UIViewController, UITableViewDelegate {
     
     
 
@@ -42,19 +42,28 @@ class ViewController: UIViewController, UITableViewDataSource {
     @IBOutlet weak var latitudeTextField: UITextField!
     @IBOutlet weak var longitudeTextField: UITextField!
     @IBOutlet weak var enterButton: UIButton!
-    @IBOutlet weak var tableView: UITableView!
     
+    @IBOutlet var tableView: UITableView!
+    @IBOutlet var activityIndicator: UIActivityIndicatorView!
+    @IBOutlet var messageLabel: UILabel!
     
     var latlonString:String? = " "
     var latitude:Double = 0
     var longitude:Double = 0
-    private var latlon: [String] = [] //array of the combined latlon strings
+    var latlon: [String] = [] //array of the combined latlon strings
+    var coordinates = [Coordinate](){
+        didSet{
+            updateView()
+        }
+    }
+    private let persistentContainer = NSPersistentContainer(name: "Coordinate")
+    
     
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        tableView.dataSource = (self as UITableViewDataSource)
-        
+ 
+        setupView()
         
         let selectedCoordinate = CLLocationCoordinate2D(latitude: 42, longitude: -71)
         let selectedAnnotation = LocationAnnotation(coordinate: selectedCoordinate, title: "Location", subtitle: "Selected location")
@@ -63,46 +72,28 @@ class ViewController: UIViewController, UITableViewDataSource {
         mapView.setRegion(selectedAnnotation.region, animated: true)
     
         tableView.dataSource = self
-
+        tableView.delegate = self
+    //  tableView.dataSource = (self as UITableViewDataSource)
     }
     
     //MARK: Actions
     @IBAction func enterLatLonPressed(_ sender: UIButton) {
         //process the lat and lon
-        latlonString = getLatLon() //string
-        latitude = getLat()
-        longitude = getLon()
-        latlon.append(getLatLon()) //adds message to an array of strings, and prints 
+//        latlonString = getLatLon() //string
+//        latitude = getLat()
+//        longitude = getLon()
+//        latlon.append(getLatLon()) //adds message to an array of strings, and prints
         
         //make an entry into coredata
        setUpData(inputLatitude: String(latitude), inputLongitude: String(longitude))
         
-        tableView.reloadData()
+        //tableView.reloadData()
         //TODO: Find place on the map, load into core data
         showCoordinatesOnMap(lat: latitude, lon: longitude)
         
     }
     
-    //MARK: TableView
-   
-    func numberOfSections(in tableView: UITableView) -> Int {
-        return 1
-    }
-    
-    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return latlon.count
-    }
-    
-    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-        let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")! //1.
-        
-        let text = latlon[indexPath.row] //2.
-        
-        cell.textLabel?.text = text //3.
-        
-        return cell
-        
-    }
+
     
     
     //MARK: Functions
@@ -127,6 +118,23 @@ class ViewController: UIViewController, UITableViewDataSource {
         return Double(longitude)
     }
     
+    func updateView() {
+        let hasCoordinates = coordinates.count > 0
+
+        tableView.isHidden = !hasCoordinates
+        messageLabel.isHidden = hasCoordinates
+    }
+    private func setupView() {
+        setupMessageLabel()
+
+        updateView()
+    }
+
+    // MARK: -
+
+    private func setupMessageLabel() {
+        messageLabel.text = "You don't have any coordinates yet."
+    }
     //MARK: FIND LOCATION
     func showCoordinatesOnMap(lat: Double, lon: Double){
     
@@ -212,5 +220,41 @@ extension ViewController: MKMapViewDelegate{
             return locationAnnotationView
         }
         return nil
+    }
+}
+
+//MARK: TableView
+extension ViewController: UITableViewDataSource{
+    
+    func numberOfSections(in tableView: UITableView) -> Int {
+        return 1
+    }
+    
+    func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
+        return coordinates.count //use the core data entries for number of tableviews created
+    }
+    
+    func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
+        guard let cell = tableView.dequeueReusableCell(withIdentifier: LatLonTableViewCell.reuseIdentifier, for: indexPath) as? LatLonTableViewCell else {
+            fatalError("Unexpected Index Path")
+        }
+        
+        // Fetch Quote
+        let coordinate = coordinates[indexPath.row]
+        
+        // Configure Cell
+        cell.latLabel.text = coordinate.latitude
+        cell.lonLabel.text = coordinate.longitude
+        
+        return cell
+        //        let cell = tableView.dequeueReusableCell(withIdentifier: "cellReuseIdentifier")! //1.
+        //
+        //        let text = latlon[indexPath.row] //2.
+        //
+        //        cell.textLabel?.text = text //3.
+        //
+        //        return cell
+        
     }
 }
