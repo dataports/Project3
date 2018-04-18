@@ -8,6 +8,7 @@
 
 import UIKit
 import MapKit
+import CoreData
 
 final class LocationAnnotation: NSObject, MKAnnotation {
     var coordinate: CLLocationCoordinate2D
@@ -47,7 +48,6 @@ class ViewController: UIViewController, UITableViewDataSource {
     var latlonString:String? = " "
     var latitude:Double = 0
     var longitude:Double = 0
-    private var data: [String] = []
     private var latlon: [String] = [] //array of the combined latlon strings
     
     
@@ -62,11 +62,6 @@ class ViewController: UIViewController, UITableViewDataSource {
         mapView.addAnnotation(selectedAnnotation)
         mapView.setRegion(selectedAnnotation.region, animated: true)
     
-        
-//        for i in 0...1000 {
-//            data.append("\(i)")
-//        }
-        
         tableView.dataSource = self
 
     }
@@ -77,7 +72,11 @@ class ViewController: UIViewController, UITableViewDataSource {
         latlonString = getLatLon() //string
         latitude = getLat()
         longitude = getLon()
-        latlon.append(getLatLon())
+        latlon.append(getLatLon()) //adds message to an array of strings, and prints 
+        
+        //make an entry into coredata
+       setUpData(inputLatitude: String(latitude), inputLongitude: String(longitude))
+        
         tableView.reloadData()
         //TODO: Find place on the map, load into core data
         showCoordinatesOnMap(lat: latitude, lon: longitude)
@@ -128,7 +127,7 @@ class ViewController: UIViewController, UITableViewDataSource {
         return Double(longitude)
     }
     
-    //FIND LOCATION
+    //MARK: FIND LOCATION
     func showCoordinatesOnMap(lat: Double, lon: Double){
     
     mapView.register(MKMarkerAnnotationView.self, forAnnotationViewWithReuseIdentifier: MKMapViewDefaultAnnotationViewReuseIdentifier)
@@ -137,6 +136,66 @@ class ViewController: UIViewController, UITableViewDataSource {
     
     mapView.addAnnotation(selectedAnnotation)
     mapView.setRegion(selectedAnnotation.region, animated: true)
+    }
+    
+    
+    //MARK: COREDATA
+
+    func setUpData(inputLatitude:String, inputLongitude: String){
+        
+        //1.  Similar to Create Database and Create SQL Table named CarData
+        // let appDelegate = UIApplication.shared.delegate as? AppDelegate
+        guard let appDelegate = UIApplication.shared.delegate as? AppDelegate else{
+            return
+        }
+        let coorinateContext = appDelegate.persistentContainer.viewContext
+        let coorinateEntity  = NSEntityDescription.entity(forEntityName:"Coordinate", in: coorinateContext)
+        
+        //2.  Similar to INSERT INTO CarData(color, price, type) VALUES ( any, any, any)
+        let newCoorinate = NSManagedObject(entity: coorinateEntity!, insertInto: coorinateContext)
+        
+        //        newCar.setValue("White", forKey: "color")
+        //        newCar.setValue("1000", forKey: "price")
+        //        newCar.setValue("4D", forKey: "type")
+        
+        
+        newCoorinate.setValue(inputLatitude, forKey: "latitude")
+        newCoorinate.setValue(inputLongitude, forKey: "longitude")
+       
+        
+        
+        saveDate(contextSaveObject: coorinateContext)
+        loadData(contextLoadObject: coorinateContext)
+    }
+    
+    func saveDate(contextSaveObject: AnyObject){
+        do{
+            try contextSaveObject.save()
+        }
+        catch{
+            print("Error Saving")
+        }
+    }
+    
+    func loadData(contextLoadObject: AnyObject){
+        let myRequest = NSFetchRequest<NSFetchRequestResult>(entityName: "Coordinate")
+        myRequest.returnsObjectsAsFaults = false
+        
+        //3.  important part of CoreData to use the VALUES in the database
+        do{
+            let result = try contextLoadObject.fetch(myRequest)
+            for data in result as! [NSManagedObject]{
+                
+                let latitudeCoordinate = data.value(forKey: "latitude")  as! String // Must cast object to String (or Int if needed)
+                let longitudeCoordinate = data.value(forKey: "longitude")  as! String
+                
+                
+                print("Here is my info from Coredata: latitude \(latitudeCoordinate), longitude \(longitudeCoordinate)")
+            }
+        }
+        catch{
+            print("Error Loading")
+        }
     }
     
 }
